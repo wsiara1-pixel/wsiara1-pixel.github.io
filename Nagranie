@@ -3,55 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Odsłuchaj nagranie</title>
+    <title>Odtwarzanie Nagrania</title>
     <style>
-        body { font-family: sans-serif; text-align: center; padding-top: 50px; background-color: #f4f4f4; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h1 { color: #333; }
-        p { color: #555; }
-        #playButton { font-size: 20px; padding: 15px 30px; cursor: pointer; background-color: #4CAF50; color: white; border: none; border-radius: 5px; transition: background-color 0.3s; }
-        #playButton:disabled { background-color: #cccccc; cursor: not-allowed; }
-        #info { margin-top: 20px; font-style: italic; color: #777; font-weight: bold; }
+        body { font-family: sans-serif; text-align: center; padding-top: 50px; background-color: #f0f0f0; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        #playButton { font-size: 18px; padding: 12px 25px; cursor: pointer; }
+        #message { margin-top: 20px; font-size: 18px; color: #333; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Instrukcja</h1>
-        <p>Kliknij przycisk poniżej, aby jednorazowo odsłuchać nagranie. Nie będzie możliwości jego zatrzymania ani przewinięcia.</p>
-        <p>Po zakończeniu nagrania zostaniesz automatycznie przeniesiony do ankiety z pytaniami.</p>
+        <h1>Odsłuchaj nagranie</h1>
+        <p>Kliknij przycisk poniżej. Nagranie zostanie odtworzone tylko raz, bez możliwości pauzy i przewijania.</p>
        
-        <!-- Ukryty odtwarzacz audio -->
-        <audio id="myAudio">
-            <!-- ZMIEŃ NAZWĘ PLIKU NA SWOJĄ -->
-            <source src="moje_nagranie.mp3" type="audio/mpeg">
-            Twoja przeglądarka nie obsługuje odtwarzacza audio.
-        </audio>
+        <audio id="myAudio"></audio>
 
-        <button id="playButton">Odtwórz nagranie</button>
-        <p id="info"></p>
+        <button id="playButton">ROZPOCZNIJ ODSŁUCHIWANIE</button>
+        <p id="message"></p>
     </div>
 
     <script>
-        const audio = document.getElementById('myAudio');
+        const audioPlayer = document.getElementById('myAudio');
         const playButton = document.getElementById('playButton');
-        const infoText = document.getElementById('info');
+        const messageBox = document.getElementById('message');
 
-        // === WAŻNE: Wklej tutaj link do swojego Formularza nr 2 ===
-        const surveyUrl = 'https://emea01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fdocs.google.com%2Fforms%2Fd%2Fe%2F...%2Fviewform&data=05%7C02%7C%7C70c9c90bb1d84484812a08de211b7c64%7C84df9e7fe9f640afb435aaaaaaaaaaaa%7C1%7C0%7C638984599084848996%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=2E0kTkPI12l0egpBJG2qE%2FrMaPA%2FwXOw7rHjW%2FQjrRU%3D&reserved=0'; // <--- ZMIEŃ TEN LINK!
+        // 1. Pobierz nazwę pliku audio z adresu URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const audioFile = urlParams.get('audio');
 
-        playButton.addEventListener('click', () => {
-            audio.play();
+        if (audioFile) {
+            audioPlayer.src = audioFile;
+        } else {
             playButton.disabled = true;
-            playButton.style.display = 'none'; // Całkowicie ukryj przycisk po kliknięciu
-            infoText.textContent = 'Odtwarzanie w toku... Proszę czekać.';
+            messageBox.textContent = 'BŁĄD: Nie znaleziono pliku audio.';
+        }
+
+        // 2. Obsługa przycisku
+        playButton.addEventListener('click', () => {
+            audioPlayer.play();
+            playButton.style.display = 'none'; // Ukryj przycisk po kliknięciu
+            messageBox.textContent = 'Odtwarzanie w toku...';
         });
 
-        audio.addEventListener('ended', () => {
-            infoText.textContent = 'Nagranie zakończone. Za chwilę nastąpi przekierowanie...';
-            setTimeout(() => {
-                window.location.href = surveyUrl;
-            }, 1500); // Daj użytkownikowi chwilę na przeczytanie komunikatu
+        // 3. Po zakończeniu odtwarzania
+        audioPlayer.addEventListener('ended', () => {
+            messageBox.textContent = 'Nagranie zakończone. Teraz możesz zamknąć tę kartę i wrócić do ankiety.';
+            // Próba automatycznego zamknięcia karty (może być blokowana przez przeglądarkę)
+            // window.close();
         });
     </script>
 
